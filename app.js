@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const ejs = require("ejs");
 const _ = require("lodash");
 
@@ -7,7 +8,23 @@ const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui 
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
-const posts = [];
+mongoose.set("strictQuery", true);
+mongoose.connect('mongodb://127.0.0.1:27017/postsDB', {useNewUrlParser: true, 
+useUnifiedTopology: true })
+.then(() => {
+    console.log("Connected to Mongo");
+})
+.catch((err) => {
+    console.log("Mongo Connection Error");
+    console.log(err);
+});
+
+const postsSchema = new mongoose.Schema({
+    title: String,
+    content: String
+});
+
+const Post = mongoose.model("Post", postsSchema);
 
 const app = express();
 
@@ -17,9 +34,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.get("/", function(req, res){
-    res.render("home", {
-        homeStartingContent: homeStartingContent,
-        posts: posts
+
+    Post.find((err, posts) => {
+        if(!err){
+            console.log("Posts Found");
+            res.render("home", {
+                homeStartingContent: homeStartingContent,
+                posts: posts
+            });
+        }
     });
 });
 
@@ -41,29 +64,43 @@ app.get("/compose", function(req, res){
     });
 });
 
-app.post("/compose", function(req, res){
-    const post = {
-        title: req.body.postTitle,
-        content: req.body.postBody
-    };
-
-    posts.push(post);
-    res.redirect("/");
+app.get("/posts/:postID", function(req, res){
+    const postID = req.params.postID;
+    Post.findOne({_id: postID}, (err, posts) => {
+        if(!err){
+            res.render("post", {
+                title: posts.title,
+                content: posts.content,
+                id: posts._id
+            });
+        }
+    });
 });
 
-app.get("/posts/:newPost", function(req, res){
-    const newPostTitle = _.lowerCase(req.params.newPost);
-    
-    posts.forEach(function(post){
-        const storedTitle = _.lowerCase(post.title);
 
-        if(newPostTitle === storedTitle){
-            res.render("post", {
-                title: post.title,
-                content: post.content
-            })
-        }
+app.post("/compose", function(req, res){
+    const postTitle = req.body.postTitle;
+    const postContent = req.body.postBody;
+    const post = new Post({
+        title: postTitle,
+        content: postContent
     })
+    post.save((err) => {
+        if(!err){
+            res.redirect("/");
+        }
+    });
+});
+
+app.post("/delete", function(req, res){
+    const deletePostID = req.body.deletePost;
+
+    Post.findByIdAndRemove(deletePostID, function(err, deletedPost){
+        if(!err){
+            console.log("Succesfully deleted post");
+            res.redirect("/");
+        }
+    });
 });
 
 
