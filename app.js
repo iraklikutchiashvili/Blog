@@ -9,8 +9,12 @@ const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pelle
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 mongoose.set("strictQuery", true);
-mongoose.connect('mongodb://127.0.0.1:27017/postsDB', {useNewUrlParser: true, 
+
+mongoose.connect('mongodb+srv://irakli9823:lqdzVA6ZOUped0HA@cluster0.f09shhc.mongodb.net/postsDB', {useNewUrlParser: true, 
 useUnifiedTopology: true })
+
+// mongoose.connect('mongodb://127.0.0.1:27017/postsDB', {useNewUrlParser: true, 
+// useUnifiedTopology: true })
 .then(() => {
     console.log("Connected to Mongo");
 })
