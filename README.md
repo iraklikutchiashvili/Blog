@@ -8,7 +8,7 @@ Blog website, where you can dynamically write new posts publish them on the home
 ## My process
 
 In process of creating used following topics: Partials, EJS templates, layouts(dynamically changing markup
-using EJS tags) Express.jsrouting(how an application’s endpoints (URIs) respond to client requests),and its routing parameters
+using EJS tags) Express.js routing(how an application’s endpoints (URIs) respond to client requests),and its routing parameters
 (to capture the values specified at their position in the URL),body-parser to parse post requests, Lodash library...
 Implemented Mongodb database and connected to Mongodbatlas.
 
